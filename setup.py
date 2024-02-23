@@ -13,7 +13,7 @@ setup(
     author='Vahid Rezanezhad',
     url='https://github.com/qurator-spk/eynollah',
     license='Apache License 2.0',
-    namespace_packages=['qurator'],
+    namespace_packages=['eynollah'],
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
     package_data={
@@ -21,8 +21,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'eynollah=qurator.eynollah.cli:main',
-            'ocrd-eynollah-segment=qurator.eynollah.ocrd_cli:main',
+            'eynollah=eynollah.eynollah.cli:main',
+            'ocrd-eynollah-segment=eynollah.eynollah.ocrd_cli:main',
         ]
     },
 )
