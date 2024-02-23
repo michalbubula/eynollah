@@ -1,5 +1,5 @@
 # Eynollah
-> Document Layout Analysis (segmentation) using pre-trained models and heuristics
+> Document Layout Analysis with Deep Learning and Heuristics
 
 [![PyPI Version](https://img.shields.io/pypi/v/eynollah)](https://pypi.org/project/eynollah/)
 [![CircleCI Build Status](https://circleci.com/gh/qurator-spk/eynollah.svg?style=shield)](https://circleci.com/gh/qurator-spk/eynollah)
@@ -19,12 +19,11 @@
 * [OCR-D](https://github.com/qurator-spk/eynollah#use-as-ocr-d-processor) interface
 
 ## Installation
-Python versions `3.8-3.11` with Tensorflow versions >=`2.12` on Linux are currently supported. Unfortunately we can not currently support Windows or MacOS. 
-Windows users may be able to successfully run the tool through [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
+Python versions `3.8-3.11` with Tensorflow versions >=`2.12` on Linux are currently supported. While we can not provide support for Windows or MacOS, Windows users may be able to install and run the tool through Linux in [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
 
 For (limited) GPU support the CUDA toolkit needs to be installed.
 
-You can either install via 
+You can either install from PyPI via 
 
 ```
 pip install eynollah
@@ -37,12 +36,10 @@ git clone git@github.com:qurator-spk/eynollah.git
 cd eynollah; pip install -e .
 ```
 
-Alternatively, you can run `make install` or `make install-dev` for editable installation.
+Alternatively, run `make install` or `make install-dev` for editable installation.
 
 ## Models
-Pre-trained models can be downloaded from [qurator-data.de](https://qurator-data.de/eynollah/).
-
-In case you want to train your own model to use with Eynollah, have a look at [sbb_pixelwise_segmentation](https://github.com/qurator-spk/sbb_pixelwise_segmentation). 
+Pre-trained models can be downloaded from [qurator-data.de](https://qurator-data.de/eynollah/). In case you want to train your own model with Eynollah, have a look at [`train`](https://github.com/qurator-spk/eynollah/tree/main/eynollah/eynollah/train). 
 
 ## Usage
 The command-line interface can be called like this:
