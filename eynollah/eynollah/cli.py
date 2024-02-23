@@ -199,8 +199,9 @@ def main(
         ignore_page_extraction=ignore_page_extraction,
     )
     eynollah.run()
-    #pcgts = eynollah.run()
-    ##eynollah.writer.write_pagexml(pcgts)
+    # pcgts = eynollah.run()
+    # eynollah.writer.write_pagexml(pcgts)
+
 
 if __name__ == "__main__":
     main()
