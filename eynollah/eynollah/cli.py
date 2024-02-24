@@ -10,7 +10,7 @@ from eynollah.eynollah.eynollah import Eynollah
     "-i",
     help="image filename",
     type=click.Path(exists=True, dir_okay=False),
-    required=True,
+    # required=True,
 )
 @click.option(
     "--out",
@@ -199,9 +199,9 @@ def main(
         light_version=light_version,
         ignore_page_extraction=ignore_page_extraction,
     )
-    # eynollah.run()
-    pcgts = eynollah.run()
-    eynollah.writer.write_pagexml(pcgts)
+    eynollah.run()
+    # pcgts = eynollah.run()
+    # eynollah.writer.write_pagexml(pcgts)
 
 
 if __name__ == "__main__":
