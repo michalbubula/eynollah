@@ -17,13 +17,14 @@
 * Detection of reading order
 * Output in [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML)
 * [OCR-D](https://github.com/qurator-spk/eynollah#use-as-ocr-d-processor) interface
+* [Examples](https://github.com/qurator-spk/eynollah/wiki#examples)
 
 ## Installation
-Python versions `3.8-3.11` with Tensorflow versions >=`2.12` on Linux are currently supported. While we can not provide support for Windows or MacOS, Windows users may be able to install and run the tool through Linux in [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
+Python versions `3.8-3.11` with Tensorflow versions >=`2.12` on Linux are currently supported.
 
 For (limited) GPU support the CUDA toolkit needs to be installed.
 
-You can either install from PyPI via 
+You can either install from PyPI
 
 ```
 pip install eynollah
@@ -39,9 +40,14 @@ cd eynollah; pip install -e .
 Alternatively, run `make install` or `make install-dev` for editable installation.
 
 ## Models
-Pre-trained models can be downloaded from [qurator-data.de](https://qurator-data.de/eynollah/). In case you want to train your own model with Eynollah, have a look at [`train`](https://github.com/qurator-spk/eynollah/tree/main/eynollah/eynollah/train). 
+Pre-trained models can be downloaded either from [qurator-data.de](https://qurator-data.de/eynollah/) or [huggingface](https://huggingface.co/SBB).
 
-## Usage
+## Train
+🚧 **Work in progress**  
+  
+In case you want to train your own model, have a look at [`train`](https://github.com/qurator-spk/eynollah/tree/main/eynollah/eynollah/train). 
+
+## Use
 The command-line interface can be called like this:
 
 ```sh
@@ -76,7 +82,6 @@ If no option is set, the tool will perform layout detection of main regions (bac
 The tool produces better quality output when RGB images are used as input than greyscale or binarized images.
 
 #### Use as OCR-D processor
-
 Eynollah ships with a CLI interface to be used as [OCR-D](https://ocr-d.de) processor. 
 
 In this case, the source image file group with (preferably) RGB images should be used as input like this:
@@ -93,8 +98,11 @@ ocrd-eynollah-segment -I OCR-D-IMG-BIN -O SEG-LINE -P models
     
 uses the original (RGB) image despite any binarization that may have occured in previous OCR-D processing steps
 
+#### Additional documentation
+Please check the [wiki](https://github.com/qurator-spk/eynollah/wiki).
+
 ## How to cite
-If you find this tool useful in your work, please consider citing our paper:
+If you find this useful in your work, please consider citing our paper:
 
 ```bibtex
 @inproceedings{rezanezhad2023eynollah,
