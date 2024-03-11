@@ -52,7 +52,7 @@ The command-line interface can be called like this:
 
 ```sh
 eynollah \
-  -i <image file> \
+  -i <single image file> | -si <directory containing image files> \
   -o <output directory> \
   -m <path to directory containing model files> \
      [OPTIONS]
