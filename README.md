@@ -20,7 +20,7 @@
 * [Examples](https://github.com/qurator-spk/eynollah/wiki#examples)
 
 ## Installation
-Python versions `3.8-3.11` with Tensorflow versions >=`2.12` on Linux are currently supported.
+Python versions `3.8-3.11` with Tensorflow version `2.13` on Linux are currently supported.
 
 For (limited) GPU support the CUDA toolkit needs to be installed.
 
@@ -52,9 +52,9 @@ The command-line interface can be called like this:
 
 ```sh
 eynollah \
-  -i <single image file> | -di <path to directory containing image files> \
+  -i <single image file> | -di <directory containing image files> \
   -o <output directory> \
-  -m <path to directory containing model files> \
+  -m <directory containing model files> \
      [OPTIONS]
 ```
 
@@ -71,7 +71,6 @@ The following options can be used to further configure the processing:
 | `-ib`  | apply binarization (the resulting image is saved to the output directory)  |
 | `-ep`  | enable plotting (MUST always be used with `-sl`, `-sd`, `-sa`, `-si` or `-ae`) |
 | `-ho`  | ignore headers for reading order dectection |
-| `-di <directory>`  | process all images in a directory in batch mode |
 | `-si <directory>`  | save image regions detected to this directory |
 | `-sd <directory>`  | save deskewed image to this directory |
 | `-sl <directory>`  | save layout prediction as plot to this directory |
