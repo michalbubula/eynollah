@@ -3037,7 +3037,7 @@ class Eynollah:
         t0_tot = time.time()
 
         if not self.dir_in:
-            self.ls_imgs = [1]
+            self.ls_imgs = str([1])
 
         for img_name in self.ls_imgs:
             t0 = time.time()
