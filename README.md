@@ -20,7 +20,7 @@
 * [Examples](https://github.com/qurator-spk/eynollah/wiki#examples)
 
 ## Installation
-Python versions `3.8-3.11` with Tensorflow version `2.13` on Linux are currently supported.
+Python versions `3.8-3.11` with Tensorflow versions `<2.16` on Linux are currently supported.
 
 For (limited) GPU support the CUDA toolkit needs to be installed.
 
