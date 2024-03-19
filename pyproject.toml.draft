@@ -31,6 +31,8 @@ dependencies = [
     "setuptools >= 61",
 ]
 
+# TODO: test dependencies
+
 [project.scripts]
 eynollah = "eynollah.eynollah.cli:main"
 ocrd-eynollah-segment = "eynollah.eynollah.ocrd_cli:main"
