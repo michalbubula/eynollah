@@ -1,7 +1,7 @@
 import os
 import sys
 import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
+from tensorflow.compat.v1.keras.backend import set_session
 import keras, warnings
 from keras.optimizers import *
 from sacred import Experiment
