@@ -1,7 +1,7 @@
+import cv2
+import imutils
 import math
 
-import imutils
-import cv2
 
 def rotatedRectWithMaxArea(w, h, angle):
     if w <= 0 or h <= 0:
@@ -25,6 +25,7 @@ def rotatedRectWithMaxArea(w, h, angle):
 
     return wr, hr
 
+
 def rotate_max_area_new(image, rotated, angle):
     wr, hr = rotatedRectWithMaxArea(image.shape[1], image.shape[0], math.radians(angle))
     h, w, _ = rotated.shape
@@ -34,17 +35,22 @@ def rotate_max_area_new(image, rotated, angle):
     x2 = x1 + int(wr)
     return rotated[y1:y2, x1:x2]
 
+
 def rotation_image_new(img, thetha):
     rotated = imutils.rotate(img, thetha)
     return rotate_max_area_new(img, rotated, thetha)
+
 
 def rotate_image(img_patch, slope):
     (h, w) = img_patch.shape[:2]
     center = (w // 2, h // 2)
     M = cv2.getRotationMatrix2D(center, slope, 1.0)
-    return cv2.warpAffine(img_patch, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return cv2.warpAffine(
+        img_patch, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE
+    )
 
-def rotate_image_different( img, slope):
+
+def rotate_image_different(img, slope):
     # img = cv2.imread('images/input.jpg')
     num_rows, num_cols = img.shape[:2]
 
@@ -52,35 +58,58 @@ def rotate_image_different( img, slope):
     img_rotation = cv2.warpAffine(img, rotation_matrix, (num_cols, num_rows))
     return img_rotation
 
-def rotate_max_area(image, rotated, rotated_textline, rotated_layout, rotated_table_prediction, angle):
+
+def rotate_max_area(
+    image, rotated, rotated_textline, rotated_layout, rotated_table_prediction, angle
+):
     wr, hr = rotatedRectWithMaxArea(image.shape[1], image.shape[0], math.radians(angle))
     h, w, _ = rotated.shape
     y1 = h // 2 - int(hr / 2)
     y2 = y1 + int(hr)
     x1 = w // 2 - int(wr / 2)
     x2 = x1 + int(wr)
-    return rotated[y1:y2, x1:x2], rotated_textline[y1:y2, x1:x2], rotated_layout[y1:y2, x1:x2], rotated_table_prediction[y1:y2, x1:x2]
+    return (
+        rotated[y1:y2, x1:x2],
+        rotated_textline[y1:y2, x1:x2],
+        rotated_layout[y1:y2, x1:x2],
+        rotated_table_prediction[y1:y2, x1:x2],
+    )
+
 
 def rotation_not_90_func(img, textline, text_regions_p_1, table_prediction, thetha):
     rotated = imutils.rotate(img, thetha)
     rotated_textline = imutils.rotate(textline, thetha)
     rotated_layout = imutils.rotate(text_regions_p_1, thetha)
     rotated_table_prediction = imutils.rotate(table_prediction, thetha)
-    return rotate_max_area(img, rotated, rotated_textline, rotated_layout, rotated_table_prediction, thetha)
+    return rotate_max_area(
+        img, rotated, rotated_textline, rotated_layout, rotated_table_prediction, thetha
+    )
 
-def rotation_not_90_func_full_layout(img, textline, text_regions_p_1, text_regions_p_fully, thetha):
+
+def rotation_not_90_func_full_layout(
+    img, textline, text_regions_p_1, text_regions_p_fully, thetha
+):
     rotated = imutils.rotate(img, thetha)
     rotated_textline = imutils.rotate(textline, thetha)
     rotated_layout = imutils.rotate(text_regions_p_1, thetha)
     rotated_layout_full = imutils.rotate(text_regions_p_fully, thetha)
-    return rotate_max_area_full_layout(img, rotated, rotated_textline, rotated_layout, rotated_layout_full, thetha)
+    return rotate_max_area_full_layout(
+        img, rotated, rotated_textline, rotated_layout, rotated_layout_full, thetha
+    )
 
-def rotate_max_area_full_layout(image, rotated, rotated_textline, rotated_layout, rotated_layout_full, angle):
+
+def rotate_max_area_full_layout(
+    image, rotated, rotated_textline, rotated_layout, rotated_layout_full, angle
+):
     wr, hr = rotatedRectWithMaxArea(image.shape[1], image.shape[0], math.radians(angle))
     h, w, _ = rotated.shape
     y1 = h // 2 - int(hr / 2)
     y2 = y1 + int(hr)
     x1 = w // 2 - int(wr / 2)
     x2 = x1 + int(wr)
-    return rotated[y1:y2, x1:x2], rotated_textline[y1:y2, x1:x2], rotated_layout[y1:y2, x1:x2], rotated_layout_full[y1:y2, x1:x2]
-
+    return (
+        rotated[y1:y2, x1:x2],
+        rotated_textline[y1:y2, x1:x2],
+        rotated_layout[y1:y2, x1:x2],
+        rotated_layout_full[y1:y2, x1:x2],
+    )

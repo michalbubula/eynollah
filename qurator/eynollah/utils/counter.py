@@ -1,9 +1,10 @@
 from collections import Counter
 
-REGION_ID_TEMPLATE = 'region_%04d'
-LINE_ID_TEMPLATE = 'region_%04d_line_%04d'
+REGION_ID_TEMPLATE = "region_%04d"
+LINE_ID_TEMPLATE = "region_%04d_line_%04d"
 
-class EynollahIdCounter():
+
+class EynollahIdCounter:
 
     def __init__(self, region_idx=0, line_idx=0):
         self._counter = Counter()
@@ -12,8 +13,8 @@ class EynollahIdCounter():
         self.reset()
 
     def reset(self):
-        self.set('region', self._initial_region_idx)
-        self.set('line', self._initial_line_idx)
+        self.set("region", self._initial_region_idx)
+        self.set("line", self._initial_line_idx)
 
     def inc(self, name, val=1):
         self._counter.update({name: val})
@@ -26,23 +27,23 @@ class EynollahIdCounter():
 
     def region_id(self, region_idx=None):
         if region_idx is None:
-            region_idx = self._counter['region']
+            region_idx = self._counter["region"]
         return REGION_ID_TEMPLATE % region_idx
 
     def line_id(self, region_idx=None, line_idx=None):
         if region_idx is None:
-            region_idx = self._counter['region']
+            region_idx = self._counter["region"]
         if line_idx is None:
-            line_idx = self._counter['line']
+            line_idx = self._counter["line"]
         return LINE_ID_TEMPLATE % (region_idx, line_idx)
 
     @property
     def next_region_id(self):
-        self.inc('region')
-        self.set('line', 0)
+        self.inc("region")
+        self.set("line", 0)
         return self.region_id()
 
     @property
     def next_line_id(self):
-        self.inc('line')
+        self.inc("line")
         return self.line_id()

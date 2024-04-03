@@ -1,5 +1,5 @@
-import sys
 import click
+import sys
 from ocrd_utils import initLogging, setOverrideLogLevel
 from qurator.eynollah.eynollah import Eynollah
 
@@ -136,7 +136,7 @@ from qurator.eynollah.eynollah import Eynollah
 @click.option(
     "--log-level",
     "-l",
-    type=click.Choice(['OFF', 'DEBUG', 'INFO', 'WARN', 'ERROR']),
+    type=click.Choice(["OFF", "DEBUG", "INFO", "WARN", "ERROR"]),
     help="Override log level globally to this",
 )
 def main(
@@ -161,19 +161,39 @@ def main(
     headers_off,
     light_version,
     ignore_page_extraction,
-    log_level
+    log_level,
 ):
     if log_level:
         setOverrideLogLevel(log_level)
     initLogging()
-    if not enable_plotting and (save_layout or save_deskewed or save_all or save_page or save_images or allow_enhancement):
-        print("Error: You used one of -sl, -sd, -sa, -sp, -si or -ae but did not enable plotting with -ep")
+    if not enable_plotting and (
+        save_layout
+        or save_deskewed
+        or save_all
+        or save_page
+        or save_images
+        or allow_enhancement
+    ):
+        print(
+            "Error: You used one of -sl, -sd, -sa, -sp, -si or -ae but did not enable plotting with -ep"
+        )
         sys.exit(1)
-    elif enable_plotting and not (save_layout or save_deskewed or save_all or save_page or save_images or allow_enhancement):
-        print("Error: You used -ep to enable plotting but set none of -sl, -sd, -sa, -sp, -si or -ae")
+    elif enable_plotting and not (
+        save_layout
+        or save_deskewed
+        or save_all
+        or save_page
+        or save_images
+        or allow_enhancement
+    ):
+        print(
+            "Error: You used -ep to enable plotting but set none of -sl, -sd, -sa, -sp, -si or -ae"
+        )
         sys.exit(1)
     if textline_light and not light_version:
-        print('Error: You used -tll to enable light textline detection but -light is not enabled')
+        print(
+            "Error: You used -tll to enable light textline detection but -light is not enabled"
+        )
         sys.exit(1)
     eynollah = Eynollah(
         image_filename=image,
@@ -199,8 +219,9 @@ def main(
         ignore_page_extraction=ignore_page_extraction,
     )
     eynollah.run()
-    #pcgts = eynollah.run()
-    ##eynollah.writer.write_pagexml(pcgts)
+    # pcgts = eynollah.run()
+    # eynollah.writer.write_pagexml(pcgts)
+
 
 if __name__ == "__main__":
     main()

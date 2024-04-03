@@ -26,25 +26,24 @@ from ocrd_models.ocrd_page import (
     UnorderedGroupIndexedType,
     UnorderedGroupType,
     WordType,
+    to_xml,
+)
 
-    to_xml)
 
 def create_page_xml(imageFilename, height, width):
     now = datetime.now()
     pcgts = PcGtsType(
-        Metadata=MetadataType(
-            Creator='SBB_QURATOR',
-            Created=now,
-            LastChange=now
-        ),
+        Metadata=MetadataType(Creator="SBB_QURATOR", Created=now, LastChange=now),
         Page=PageType(
             imageWidth=str(width),
             imageHeight=str(height),
             imageFilename=imageFilename,
-            readingDirection='left-to-right',
-            textLineOrder='top-to-bottom'
-        ))
+            readingDirection="left-to-right",
+            textLineOrder="top-to-bottom",
+        ),
+    )
     return pcgts
+
 
 def xml_reading_order(page, order_of_texts, id_of_marginalia):
     region_order = ReadingOrderType()
@@ -53,13 +52,31 @@ def xml_reading_order(page, order_of_texts, id_of_marginalia):
     region_order.set_OrderedGroup(og)
     region_counter = EynollahIdCounter()
     for idx_textregion, _ in enumerate(order_of_texts):
-        og.add_RegionRefIndexed(RegionRefIndexedType(index=str(region_counter.get('region')), regionRef=region_counter.region_id(order_of_texts[idx_textregion] + 1)))
-        region_counter.inc('region')
+        og.add_RegionRefIndexed(
+            RegionRefIndexedType(
+                index=str(region_counter.get("region")),
+                regionRef=region_counter.region_id(order_of_texts[idx_textregion] + 1),
+            )
+        )
+        region_counter.inc("region")
     for id_marginal in id_of_marginalia:
-        og.add_RegionRefIndexed(RegionRefIndexedType(index=str(region_counter.get('region')), regionRef=id_marginal))
-        region_counter.inc('region')
+        og.add_RegionRefIndexed(
+            RegionRefIndexedType(
+                index=str(region_counter.get("region")), regionRef=id_marginal
+            )
+        )
+        region_counter.inc("region")
 
-def order_and_id_of_texts(found_polygons_text_region, found_polygons_text_region_h, matrix_of_orders, indexes_sorted, index_of_types, kind_of_texts, ref_point):
+
+def order_and_id_of_texts(
+    found_polygons_text_region,
+    found_polygons_text_region_h,
+    matrix_of_orders,
+    indexes_sorted,
+    index_of_types,
+    kind_of_texts,
+    ref_point,
+):
     indexes_sorted = np.array(indexes_sorted)
     index_of_types = np.array(index_of_types)
     kind_of_texts = np.array(kind_of_texts)
@@ -76,7 +93,9 @@ def order_and_id_of_texts(found_polygons_text_region, found_polygons_text_region
     counter = EynollahIdCounter(region_idx=ref_point)
     for idx_textregion, _ in enumerate(found_polygons_text_region):
         id_of_texts.append(counter.next_region_id)
-        interest = indexes_sorted_1[indexes_sorted_1 == index_of_types_1[idx_textregion]]
+        interest = indexes_sorted_1[
+            indexes_sorted_1 == index_of_types_1[idx_textregion]
+        ]
         if len(interest) > 0:
             order_of_texts.append(interest[0])
 
