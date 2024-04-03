@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from multiprocessing import Process, Queue, cpu_count
 from multiprocessing import Pool
-from .rotate import rotate_image, rotation_image_new
 from shapely import geometry
+from .rotate import rotate_image, rotation_image_new
 
 
 def contours_in_same_horizon(cy_main_hor):

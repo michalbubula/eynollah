@@ -1,9 +1,7 @@
 # pylint: disable=too-many-locals,wrong-import-position,too-many-lines,too-many-statements,chained-comparison,fixme,broad-except,c-extension-no-member
 # pylint: disable=invalid-name
-from .counter import EynollahIdCounter
 import numpy as np
 from datetime import datetime
-
 from ocrd_models.ocrd_page import (
     CoordsType,
     GlyphType,
@@ -28,6 +26,7 @@ from ocrd_models.ocrd_page import (
     WordType,
     to_xml,
 )
+from .counter import EynollahIdCounter
 
 
 def create_page_xml(imageFilename, height, width):

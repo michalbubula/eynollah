@@ -6,13 +6,13 @@ import numpy as np
 from scipy.signal import find_peaks
 from scipy.ndimage import gaussian_filter1d
 from shapely import geometry
-from .is_nan import isNaN
 from .contour import (
     contours_in_same_horizon,
     find_new_features_of_contours,
     return_contours_of_image,
     return_parent_contours,
 )
+from .is_nan import isNaN
 
 
 def return_x_start_end_mothers_childs_and_type_of_reading_order(

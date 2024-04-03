@@ -5,37 +5,26 @@
 """
 document layout analysis (segmentation) with output in PAGE-XML
 """
-
+import cv2
+import gc
 import math
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import sys
+import tensorflow as tf
 import time
 import warnings
 from pathlib import Path
 from multiprocessing import Process, Queue, cpu_count
-import gc
 from ocrd_utils import getLogger
-import cv2
-import numpy as np
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-stderr = sys.stderr
-sys.stderr = open(os.devnull, "w")
-import tensorflow as tf
+from tensorflow.compat.v1.keras.backend import set_session  # tf1 api compatibility fix
+from tensorflow.keras import layers
 from tensorflow.python.keras import backend as K
 from tensorflow.keras.models import load_model
-
-sys.stderr = stderr
-tf.get_logger().setLevel("ERROR")
-warnings.filterwarnings("ignore")
 from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
-
-# use tf1 compatibility for keras backend
-from tensorflow.compat.v1.keras.backend import set_session
-from tensorflow.keras import layers
-
+from .plot import EynollahPlotter
 from .utils.contour import (
     filter_contours_area_of_image,
     filter_contours_area_of_image_tables,
@@ -51,22 +40,22 @@ from .utils.contour import (
     return_contours_of_interested_textline,
     return_parent_contours,
 )
-from .utils.rotate import (
-    rotate_image,
-    rotation_not_90_func,
-    rotation_not_90_func_full_layout,
-)
-from .utils.separate_lines import (
-    textline_contours_postprocessing,
-    separate_lines_new2,
-    return_deskew_slop,
-)
 from .utils.drop_capitals import (
     adhere_drop_capital_region_into_corresponding_textline,
     filter_small_drop_capitals_from_no_patch_layout,
 )
 from .utils.marginals import get_marginals
+from .utils.rotate import (
+    rotate_image,
+    rotation_not_90_func,
+    rotation_not_90_func_full_layout,
+)
 from .utils.resize import resize_image
+from .utils.separate_lines import (
+    textline_contours_postprocessing,
+    separate_lines_new2,
+    return_deskew_slop,
+)
 from .utils import (
     boosting_headers_by_longshot_region_segmentation,
     crop_image_inside_box,
@@ -83,8 +72,14 @@ from .utils import (
 )
 from .utils.pil_cv2 import check_dpi, pil2cv
 from .utils.xml import order_and_id_of_texts
-from .plot import EynollahPlotter
 from .writer import EynollahXmlWriter
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+stderr = sys.stderr
+sys.stderr = stderr
+sys.stderr = open(os.devnull, "w")
+tf.get_logger().setLevel("ERROR")
+warnings.filterwarnings("ignore")
 
 SLOPE_THRESHOLD = 0.13
 RATIO_OF_TWO_MODEL_THRESHOLD = 95.50  # 98.45:
@@ -2710,7 +2705,7 @@ class Eynollah:
                 for jj in range(len(boxes)):
                     if (
                             boxes[jj][0] <= (x_min_text_only[ii] + 80) < boxes[jj][1]
-                                and boxes[jj][2] <= y_cor_x_min_main[ii] < boxes[jj][3]
+                            and boxes[jj][2] <= y_cor_x_min_main[ii] < boxes[jj][3]
                     ):
                         arg_text_con.append(jj)
                         break
@@ -2720,7 +2715,7 @@ class Eynollah:
                 for jj in range(len(boxes)):
                     if (
                             boxes[jj][0] <= (x_min_text_only_h[ii] + 80) < boxes[jj][1]
-                                and boxes[jj][2] <= y_cor_x_min_main_h[ii] < boxes[jj][3]
+                            and boxes[jj][2] <= y_cor_x_min_main_h[ii] < boxes[jj][3]
                     ):
                         arg_text_con_h.append(jj)
                         break
@@ -2820,7 +2815,7 @@ class Eynollah:
                 for jj in range(len(boxes)):
                     if (
                             boxes[jj][0] <= cx_text_only[ii] < boxes[jj][1]
-                                and boxes[jj][2] <= cy_text_only[ii] < boxes[jj][3]
+                            and boxes[jj][2] <= cy_text_only[ii] < boxes[jj][3]
                     ):  # this is valid if the center of region identify in which box it is located
                         arg_text_con.append(jj)
                         break
@@ -2835,7 +2830,7 @@ class Eynollah:
                 for jj in range(len(boxes)):
                     if (
                             boxes[jj][0] <= cx_text_only_h[ii] < boxes[jj][1]
-                                and boxes[jj][2] <= cy_text_only_h[ii] < boxes[jj][3]
+                            and boxes[jj][2] <= cy_text_only_h[ii] < boxes[jj][3]
                     ):  # this is valid if the center of region identify in which box it is located
                         arg_text_con_h.append(jj)
                         break
@@ -2945,7 +2940,7 @@ class Eynollah:
                 for jj in range(len(boxes)):
                     if (
                             boxes[jj][0] <= (x_min_text_only[ii] + 80) < boxes[jj][1]
-                                and boxes[jj][2] <= y_cor_x_min_main[ii] < boxes[jj][3]
+                            and boxes[jj][2] <= y_cor_x_min_main[ii] < boxes[jj][3]
                     ):
                         arg_text_con.append(jj)
                         break
@@ -3024,7 +3019,7 @@ class Eynollah:
                 for jj in range(len(boxes)):
                     if (
                             boxes[jj][0] <= cx_text_only[ii] < boxes[jj][1]
-                                and boxes[jj][2] <= cy_text_only[ii] < boxes[jj][3]
+                            and boxes[jj][2] <= cy_text_only[ii] < boxes[jj][3]
                     ):  # this is valid if the center of region identify in which box it is located
                         arg_text_con.append(jj)
                         break

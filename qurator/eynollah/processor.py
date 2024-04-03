@@ -1,11 +1,9 @@
 from json import loads
+from os.path import join
+from pathlib import Path
+from PIL import Image
 from pkg_resources import resource_string
 from tempfile import NamedTemporaryFile
-from pathlib import Path
-from os.path import join
-
-from PIL import Image
-
 from ocrd import Processor
 from ocrd_modelfactory import page_from_file, exif_from_filename
 from ocrd_models import OcrdFile, OcrdExif

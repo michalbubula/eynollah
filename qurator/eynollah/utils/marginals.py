@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 from scipy.signal import find_peaks
 from scipy.ndimage import gaussian_filter1d
-
 from .contour import find_new_features_of_contours, return_contours_of_interested_region
 from .resize import resize_image
 from .rotate import rotate_image

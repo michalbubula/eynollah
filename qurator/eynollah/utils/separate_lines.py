@@ -3,8 +3,6 @@ import numpy as np
 import os
 from scipy.signal import find_peaks
 from scipy.ndimage import gaussian_filter1d
-
-from .rotate import rotate_image
 from .contour import (
     return_parent_contours,
     filter_contours_area_of_image_tables,
@@ -12,6 +10,7 @@ from .contour import (
     filter_contours_area_of_image,
 )
 from .is_nan import isNaN
+from .rotate import rotate_image
 from . import (
     find_num_col_deskew,
     isNaN,
