@@ -1,4 +1,9 @@
-EYNOLLAH_MODELS ?= $(PWD)/models_eynollah
+ifneq (,$(wildcard $(HOME)/.local/share/ocrd-resources/ocrd-eynollah-segment/default))
+EYNOLLAH_MODELS = $(HOME)/.local/share/ocrd-resources/ocrd-eynollah-segment/default
+else
+EYNOLLAH_MODELS = $(PWD)/models_eynollah
+endif
+
 export EYNOLLAH_MODELS
 
 # BEGIN-EVAL makefile-parser --make-help Makefile
@@ -47,4 +52,5 @@ smoke-test:
 
 # Run unit tests
 test:
+	echo $(EYNOLLAH_MODELS)
 	pytest tests

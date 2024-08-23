@@ -19,10 +19,15 @@ from ocrd import OcrdPage
 import cv2
 import numpy as np
 from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
 
-from qurator.eynollah.utils.tf import tf, PatchEncoder, Patches
+from .utils.tf import (
+    PatchEncoder,
+    Patches,
+    load_model,
+    set_session,
+    tf,
+)
 
 from .utils.contour import (
     filter_contours_area_of_image,
@@ -252,7 +257,7 @@ class Eynollah():
 
     def predict_enhancement(self, img):
         self.logger.debug("enter predict_enhancement")
-        model_enhancement, session_enhancement = self.start_new_session_and_model(self.model_dir_of_enhancement)
+        model_enhancement = self.load_model(self.model_dir_of_enhancement)
 
         img_height_model = model_enhancement.layers[len(model_enhancement.layers) - 1].output_shape[1]
         img_width_model = model_enhancement.layers[len(model_enhancement.layers) - 1].output_shape[2]
@@ -411,7 +416,7 @@ class Eynollah():
 
         _, page_coord = self.early_page_for_num_of_column_classification(img)
         if not self.dir_in:
-            model_num_classifier, session_col_classifier = self.start_new_session_and_model(self.model_dir_of_col_classifier)
+            model_num_classifier = self.load_model(self.model_dir_of_col_classifier)
         if self.input_binary:
             img_in = np.copy(img)
             img_in = img_in / 255.0
@@ -461,7 +466,7 @@ class Eynollah():
                 prediction_bin = self.do_prediction(True, img, self.model_bin)
             else:
                 
-                model_bin, session_bin = self.start_new_session_and_model(self.model_dir_of_binarization)
+                model_bin = self.load_model(self.model_dir_of_binarization)
                 prediction_bin = self.do_prediction(True, img, model_bin)
             
             prediction_bin=prediction_bin[:,:,0]
@@ -480,7 +485,7 @@ class Eynollah():
         t1 = time.time()
         _, page_coord = self.early_page_for_num_of_column_classification(img_bin)
         if not self.dir_in:
-            model_num_classifier, session_col_classifier = self.start_new_session_and_model(self.model_dir_of_col_classifier)
+            model_num_classifier = self.load_model(self.model_dir_of_col_classifier)
         
         if self.input_binary:
             img_in = np.copy(img)
@@ -574,16 +579,13 @@ class Eynollah():
         self.writer.height_org = self.height_org
         self.writer.width_org = self.width_org
     
-    def start_new_session_and_model(self, model_dir) -> tf.keras.Model:
+    def load_model(self, model_dir) -> tf.keras.Model:
         self.logger.debug("enter start_new_session_and_model (model_dir=%s)", model_dir)
-        #gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
-        #gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=7.7, allow_growth=True)
-        #session = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
         physical_devices = tf.config.list_physical_devices('GPU')
         try:
             for device in physical_devices:
                 tf.config.experimental.set_memory_growth(device, True)
-        except:
+        except ValueError:
             self.logger.warning("no GPU device available")
 
         if model_dir.endswith('.h5') and Path(model_dir[:-3]).exists():
@@ -895,7 +897,7 @@ class Eynollah():
             img = cv2.GaussianBlur(self.image, (5, 5), 0)
             
             if not self.dir_in:
-                model_page = self.start_new_session_and_model(self.model_page_dir)
+                model_page = self.load_model(self.model_page_dir)
                 
             if not self.dir_in:
                 img_page_prediction = self.do_prediction(False, img, model_page)
@@ -943,7 +945,7 @@ class Eynollah():
             else:
                 img = self.imread()
             if not self.dir_in:
-                model_page = self.start_new_session_and_model(self.model_page_dir)
+                model_page = self.load_model(self.model_page_dir)
             img = cv2.GaussianBlur(img, (5, 5), 0)
             
             if self.dir_in:
@@ -976,7 +978,7 @@ class Eynollah():
         img_height_h = img.shape[0]
         img_width_h = img.shape[1]
         if not self.dir_in:
-            model_region, session_region = self.start_new_session_and_model(self.model_region_dir_fully if patches else self.model_region_dir_fully_np)
+            model_region = self.load_model(self.model_region_dir_fully if patches else self.model_region_dir_fully_np)
         else:
             model_region = self.model_region_fl if patches else self.model_region_fl_np
 
@@ -1443,7 +1445,7 @@ class Eynollah():
     def textline_contours(self, img, patches, scaler_h, scaler_w):
         self.logger.debug('enter textline_contours')
         if not self.dir_in:
-            model_textline, session_textline = self.start_new_session_and_model(self.model_textline_dir if patches else self.model_textline_dir_np)
+            model_textline = self.load_model(self.model_textline_dir if patches else self.model_textline_dir_np)
         img = img.astype(np.uint8)
         img_org = np.copy(img)
         img_h = img_org.shape[0]
@@ -1535,7 +1537,7 @@ class Eynollah():
         img_resized = resize_image(img,img_h_new, img_w_new )
         
         if not self.dir_in:
-            model_bin, session_bin = self.start_new_session_and_model(self.model_dir_of_binarization)
+            model_bin = self.load_model(self.model_dir_of_binarization)
             prediction_bin = self.do_prediction(True, img_resized, model_bin)
         else:
             prediction_bin = self.do_prediction(True, img_resized, self.model_bin)
@@ -1554,7 +1556,7 @@ class Eynollah():
         textline_mask_tot_ea = self.run_textline(img_bin)
 
         if not self.dir_in:
-            model_region, session_region = self.start_new_session_and_model(self.model_region_dir_p_ens_light)
+            model_region = self.load_model(self.model_region_dir_p_ens_light)
             prediction_regions_org = self.do_prediction_new_concept(True, img_bin, model_region)
         else:
             prediction_regions_org = self.do_prediction_new_concept(True, img_bin, self.model_region)
@@ -1599,7 +1601,7 @@ class Eynollah():
         img_width_h = img_org.shape[1]
         
         if not self.dir_in:
-            model_region, session_region = self.start_new_session_and_model(self.model_region_dir_p_ens)
+            model_region = self.load_model(self.model_region_dir_p_ens)
 
         ratio_y=1.3
         ratio_x=1
@@ -1638,7 +1640,7 @@ class Eynollah():
             
             
             if not self.dir_in:
-                model_region, session_region = self.start_new_session_and_model(self.model_region_dir_p2)
+                model_region = self.load_model(self.model_region_dir_p2)
 
             img = resize_image(img_org, int(img_org.shape[0]), int(img_org.shape[1]))
             
@@ -1677,7 +1679,7 @@ class Eynollah():
                     prediction_bin = np.copy(img_org)
                 else:
                     if not self.dir_in:
-                        model_bin, session_bin = self.start_new_session_and_model(self.model_dir_of_binarization)
+                        model_bin = self.load_model(self.model_dir_of_binarization)
                         prediction_bin = self.do_prediction(True, img_org, model_bin)
                     else:
                         prediction_bin = self.do_prediction(True, img_org, self.model_bin)
@@ -1690,7 +1692,7 @@ class Eynollah():
                     prediction_bin =np.repeat(prediction_bin[:, :, np.newaxis], 3, axis=2)
                 
                 if not self.dir_in:
-                    model_region, session_region = self.start_new_session_and_model(self.model_region_dir_p_ens)
+                    model_region = self.load_model(self.model_region_dir_p_ens)
                 ratio_y=1
                 ratio_x=1
 
@@ -1730,7 +1732,7 @@ class Eynollah():
                 prediction_bin = np.copy(img_org)
                 
                 if not self.dir_in:
-                    model_bin, session_bin = self.start_new_session_and_model(self.model_dir_of_binarization)
+                    model_bin = self.load_model(self.model_dir_of_binarization)
                     prediction_bin = self.do_prediction(True, img_org, model_bin)
                 else:
                     prediction_bin = self.do_prediction(True, img_org, self.model_bin)
@@ -1745,7 +1747,7 @@ class Eynollah():
             
             
                 if not self.dir_in:
-                    model_region, session_region = self.start_new_session_and_model(self.model_region_dir_p_ens)
+                    model_region = self.load_model(self.model_region_dir_p_ens)
                     
             else:
                 prediction_bin = np.copy(img_org)
@@ -2266,7 +2268,7 @@ class Eynollah():
         img_height_h = img_org.shape[0]
         img_width_h = img_org.shape[1]
         
-        model_region, session_region = self.start_new_session_and_model(self.model_tables)
+        model_region = self.load_model(self.model_tables)
         
         patches = False
         
