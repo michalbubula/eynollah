@@ -587,16 +587,6 @@ class Eynollah():
         self.writer.height_org = self.height_org
         self.writer.width_org = self.width_org
 
-    def start_new_session_and_model_old(self, model_dir):
-        self.logger.debug("enter start_new_session_and_model (model_dir=%s)", model_dir)
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-
-        session = tf.InteractiveSession()
-        model = load_model(model_dir, compile=False)
-
-        return model, session
-
     
     def start_new_session_and_model(self, model_dir):
         self.logger.debug("enter start_new_session_and_model (model_dir=%s)", model_dir)
@@ -623,7 +613,7 @@ class Eynollah():
                 model = load_model(model_dir , compile=False, custom_objects = {"PatchEncoder": PatchEncoder, "Patches": Patches})
                 self.models[model_dir] = model
 
-
+        # FIXME: why?
         return model, None
 
     def do_prediction(self, patches, img, model, marginal_of_patch_percent=0.1):
