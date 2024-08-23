@@ -1447,40 +1447,6 @@ class Eynollah():
             return prediction_textline[:, :, 0], prediction_textline_longshot_true_size[:, :, 0]
 
 
-    def do_work_of_slopes(self, q, poly, box_sub, boxes_per_process, textline_mask_tot, contours_per_process):
-        self.logger.debug('enter do_work_of_slopes')
-        slope_biggest = 0
-        slopes_sub = []
-        boxes_sub_new = []
-        poly_sub = []
-        for mv in range(len(boxes_per_process)):
-            crop_img, _ = crop_image_inside_box(boxes_per_process[mv], np.repeat(textline_mask_tot[:, :, np.newaxis], 3, axis=2))
-            crop_img = crop_img[:, :, 0]
-            crop_img = cv2.erode(crop_img, KERNEL, iterations=2)
-            try:
-                textline_con, hierarchy = return_contours_of_image(crop_img)
-                textline_con_fil = filter_contours_area_of_image(crop_img, textline_con, hierarchy, max_area=1, min_area=0.0008)
-                y_diff_mean = find_contours_mean_y_diff(textline_con_fil)
-                sigma_des = max(1, int(y_diff_mean * (4.0 / 40.0)))
-                crop_img[crop_img > 0] = 1
-                slope_corresponding_textregion = return_deskew_slop(crop_img, sigma_des, plotter=self.plotter)
-            except Exception as why:
-                self.logger.error(why)
-                slope_corresponding_textregion = MAX_SLOPE
-
-            if slope_corresponding_textregion == MAX_SLOPE:
-                slope_corresponding_textregion = slope_biggest
-            slopes_sub.append(slope_corresponding_textregion)
-
-            cnt_clean_rot = textline_contours_postprocessing(crop_img, slope_corresponding_textregion, contours_per_process[mv], boxes_per_process[mv])
-
-            poly_sub.append(cnt_clean_rot)
-            boxes_sub_new.append(boxes_per_process[mv])
-
-        q.put(slopes_sub)
-        poly.put(poly_sub)
-        box_sub.put(boxes_sub_new)
-
     def get_regions_light_v(self,img,is_image_enhanced, num_col_classifier):
         self.logger.debug("enter get_regions_light_v")
         erosion_hurts = False
