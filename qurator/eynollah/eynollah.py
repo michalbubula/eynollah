@@ -150,7 +150,6 @@ class Eynollah:
         logger : Logger,
         image_filename : Optional[str] = None,
         image_pil : Optional[Image] = None,
-        image_filename_stem : Optional[str] = None,
         dir_out : Optional[str] = None,
         dir_in : Optional[str] = None,
         dir_of_cropped_images : Optional[str] = None,
@@ -285,6 +284,7 @@ class Eynollah:
         for prefix in ('',  '_grayscale'):
             ret[f'img{prefix}_uint8'] = ret[f'img{prefix}'].astype(np.uint8)
         return ret
+
     def reset_file_name_dir(self, image_filename):
         self._imgs = self._cache_images(image_filename=image_filename)
         self.image_filename = image_filename
@@ -2816,12 +2816,10 @@ class Eynollah:
         return polygons_of_images, img_revised_tab, text_regions_p_1_n, textline_mask_tot_d, regions_without_separators_d, regions_fully, regions_without_separators, polygons_of_marginals, contours_tables
     
     def our_load_model(self, model_file):
-        
         try:
             model = load_model(model_file, compile=False)
         except:
-            model = load_model(model_file , compile=False,custom_objects = {"PatchEncoder": PatchEncoder, "Patches": Patches})
-
+            model = load_model(model_file , compile=False, custom_objects = {"PatchEncoder": PatchEncoder, "Patches": Patches})
         return model
 
     def run(self):
