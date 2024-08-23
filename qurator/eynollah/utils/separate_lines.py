@@ -778,7 +778,7 @@ def separate_lines_new_inside_tiles2(img_patch, thetha):
     img_patch = cv2.erode(img_patch, kernel, iterations=1)
     return img_patch
 
-def separate_lines_vertical_cont(img_patch, contour_text_interest, thetha, box_ind, add_boxes_coor_into_textlines):
+def separate_lines_vertical_cont(img_patch):
     kernel = np.ones((5, 5), np.uint8)
     pixel = 255
     min_area = 0
@@ -798,7 +798,6 @@ def separate_lines_vertical_cont(img_patch, contour_text_interest, thetha, box_i
     contours_imgs = filter_contours_area_of_image_tables(thresh, contours_imgs, hierarchy, max_area=max_area, min_area=min_area)
 
     cont_final = []
-    ###print(add_boxes_coor_into_textlines,'ikki')
     for i in range(len(contours_imgs)):
         img_contour = np.zeros((cnts_images.shape[0], cnts_images.shape[1], 3))
         img_contour = cv2.fillPoly(img_contour, pts=[contours_imgs[i]], color=(255, 255, 255))
@@ -809,17 +808,8 @@ def separate_lines_vertical_cont(img_patch, contour_text_interest, thetha, box_i
         imgrayrot = cv2.cvtColor(img_contour, cv2.COLOR_BGR2GRAY)
         _, threshrot = cv2.threshold(imgrayrot, 0, 255, 0)
         contours_text_rot, _ = cv2.findContours(threshrot.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-        ##contour_text_copy[:, 0, 0] = contour_text_copy[:, 0, 0] - box_ind[
-        ##0]
-        ##contour_text_copy[:, 0, 1] = contour_text_copy[:, 0, 1] - box_ind[1]
-        ##if add_boxes_coor_into_textlines:
-        ##print(np.shape(contours_text_rot[0]),'sjppo')
-        ##contours_text_rot[0][:, 0, 0]=contours_text_rot[0][:, 0, 0] + box_ind[0]
-        ##contours_text_rot[0][:, 0, 1]=contours_text_rot[0][:, 0, 1] + box_ind[1]
         cont_final.append(contours_text_rot[0])
 
-    ##print(cont_final,'nadizzzz')
     return None, cont_final
 
 
@@ -903,7 +893,7 @@ def textline_contours_postprocessing(textline_mask, slope, contour_text_interest
         # print('juzaa')
         if abs(slope) > 45:
             # print(add_boxes_coor_into_textlines,'avval')
-            _, contours_rotated_clean = separate_lines_vertical_cont(textline_mask, contours_text_rot[ind_big_con], box_ind, slope, add_boxes_coor_into_textlines=add_boxes_coor_into_textlines)
+            _, contours_rotated_clean = separate_lines_vertical_cont(textline_mask)
         else:
             _, contours_rotated_clean = separate_lines(dst, contours_text_rot[ind_big_con], slope, x_help, y_help)
 
