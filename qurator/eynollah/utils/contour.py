@@ -107,6 +107,7 @@ def find_new_features_of_contours(contours_main):
     # dis_x=np.abs(x_max_main-x_min_main)
 
     return cx_main, cy_main, x_min_main, x_max_main, y_min_main, y_max_main, y_corr_x_min_from_argmin
+
 def find_features_of_contours(contours_main):
     
 

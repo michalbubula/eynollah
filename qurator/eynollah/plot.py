@@ -17,7 +17,6 @@ class EynollahPlotter():
 
     def __init__(
         self,
-        *,
         dirs : EynollahDirs,
         image_filename_stem,
         image_org=None,

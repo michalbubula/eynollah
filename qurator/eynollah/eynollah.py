@@ -83,6 +83,7 @@ RATIO_OF_TWO_MODEL_THRESHOLD = 95.50 #98.45:
 DPI_THRESHOLD = 298
 MAX_SLOPE = 999
 KERNEL = np.ones((5, 5), np.uint8)
+PREDICT_VERBOSE = 0
 
 class Eynollah():
 
@@ -134,7 +135,7 @@ class Eynollah():
         # self.batch_mode = bool(self.dirs.dir_in)
         if not dirs.dir_in:
             assert self.image_filename
-            self.plotter = None if not self.enable_plotting else EynollahPlotter(self.dirs, image_filename_stem=Path(Path(image_filename).name).stem)
+            self.plotter = None if not self.enable_plotting else EynollahPlotter(self.dirs, image_filename_stem=Path(Path(self.image_filename).name).stem)
             self.writer = EynollahXmlWriter(
                 dir_out=self.dirs.dir_out,
                 image_filename=self.image_filename,
@@ -146,7 +147,8 @@ class Eynollah():
         self.model_dir_of_enhancement = dirs.dir_models + "/eynollah-enhancement_20210425"
         self.model_dir_of_binarization = dirs.dir_models + "/eynollah-binarization_20210425"
         self.model_dir_of_col_classifier = dirs.dir_models + "/eynollah-column-classifier_20210425"
-        self.model_region_dir_p = dirs.dir_models + "/eynollah-main-regions-aug-scaling_20210425"
+        # FIXME: unused
+        # self.model_region_dir_p = dirs.dir_models + "/eynollah-main-regions-aug-scaling_20210425"
         self.model_region_dir_p2 = dirs.dir_models + "/eynollah-main-regions-aug-rotation_20210425"
         self.model_region_dir_fully_np = dirs.dir_models + "/eynollah-full-regions-1column_20210425"
         self.model_region_dir_fully = dirs.dir_models + "/eynollah-full-regions-3+column_20210425"
@@ -282,8 +284,10 @@ class Eynollah():
                     index_y_d = img_h - img_height_model
 
                 img_patch = img[index_y_d:index_y_u, index_x_d:index_x_u, :]
-                label_p_pred = model_enhancement.predict(img_patch.reshape(1, img_patch.shape[0], img_patch.shape[1], img_patch.shape[2]),
-                                                         verbose=0)
+                label_p_pred = model_enhancement.predict(
+                    img_patch.reshape(1, img_patch.shape[0], img_patch.shape[1], img_patch.shape[2]),
+                    verbose=PREDICT_VERBOSE   # type: ignore
+                )
 
                 seg = label_p_pred[0, :, :, :]
                 seg = seg * 255
@@ -418,9 +422,15 @@ class Eynollah():
             img_in[0, :, :, 2] = img_1ch[:, :]
 
         if not self.batch_processing_mode:
-            label_p_pred = model_num_classifier.predict(img_in, verbose=0)
+            label_p_pred = model_num_classifier.predict(
+                img_in,
+                verbose=PREDICT_VERBOSE # type: ignore
+            )
         else:
-            label_p_pred = self.model_classifier.predict(img_in, verbose=0)
+            label_p_pred = self.model_classifier.predict(
+                img_in,
+                verbose=PREDICT_VERBOSE # type: ignore
+            )
 
         num_col = np.argmax(label_p_pred[0]) + 1
 
@@ -485,9 +495,15 @@ class Eynollah():
 
 
         if self.batch_processing_mode:
-            label_p_pred = self.model_classifier.predict(img_in, verbose=0)
+            label_p_pred = self.model_classifier.predict(
+                img_in,
+                verbose=PREDICT_VERBOSE # type: ignore
+            )
         else:
-            label_p_pred = model_num_classifier.predict(img_in, verbose=0)
+            label_p_pred = model_num_classifier.predict(
+                img_in,
+                verbose=PREDICT_VERBOSE # type: ignore
+            )
         num_col = np.argmax(label_p_pred[0]) + 1
         
         self.logger.info("Found %d columns (%s)", num_col, np.around(label_p_pred, decimals=5))
@@ -594,7 +610,7 @@ class Eynollah():
             img = resize_image(img, img_height_model, img_width_model)
 
             label_p_pred = model.predict(img.reshape(1, img.shape[0], img.shape[1], img.shape[2]),
-                                         verbose=0)
+                                         verbose=PREDICT_VERBOSE)
 
             seg = np.argmax(label_p_pred, axis=3)[0]
             seg_color = np.repeat(seg[:, :, np.newaxis], 3, axis=2)
@@ -647,7 +663,7 @@ class Eynollah():
 
                     img_patch = img[index_y_d:index_y_u, index_x_d:index_x_u, :]
                     label_p_pred = model.predict(img_patch.reshape(1, img_patch.shape[0], img_patch.shape[1], img_patch.shape[2]),
-                                                 verbose=0)
+                                                 verbose=PREDICT_VERBOSE)
                     seg = np.argmax(label_p_pred, axis=3)[0]
                     seg_color = np.repeat(seg[:, :, np.newaxis], 3, axis=2)
 
@@ -713,6 +729,7 @@ class Eynollah():
             img = img / float(255.0)
             img = resize_image(img, img_height_model, img_width_model)
 
+            # FIXME: conscious decision to leave verbose at auto?
             label_p_pred = model.predict(img.reshape(1, img.shape[0], img.shape[1], img.shape[2]))
 
 
@@ -766,8 +783,8 @@ class Eynollah():
                         index_y_d = img_h - img_height_model
 
                     img_patch = img[index_y_d:index_y_u, index_x_d:index_x_u, :]
-                    label_p_pred = model.predict(img_patch.reshape(1, img_patch.shape[0], img_patch.shape[1], img_patch.shape[2]),
-                                                 verbose=0)
+                    label_p_pred = model.predict(img_patch.reshape(1, img_patch.shape[0], img_patch.shape[1], img_patch.shape[2]), verbose=PREDICT_VERBOSE)
+
                     seg = np.argmax(label_p_pred, axis=3)[0]
                     
                     
@@ -2139,13 +2156,14 @@ class Eynollah():
 
                     image_box_tabels=image_box_tabels.astype(np.uint8)
                     imgray = cv2.cvtColor(image_box_tabels, cv2.COLOR_BGR2GRAY)
-                    ret, thresh = cv2.threshold(imgray, 0, 255, 0)
+                    _, thresh = cv2.threshold(imgray, 0, 255, 0)
 
-                    contours_line,hierachy=cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+                    contours_line, _ = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
                     y_min_main_line ,y_max_main_line=find_features_of_contours(contours_line)
                     y_min_main_tab ,y_max_main_tab=find_features_of_contours(contours_tab)
 
+                    # FIXME: unused - necessary for side effects? 
                     cx_tab_m_text,cy_tab_m_text ,x_min_tab_m_text , x_max_tab_m_text, y_min_tab_m_text ,y_max_tab_m_text, _= find_new_features_of_contours(contours_table_m_text)
                     cx_tabl,cy_tabl ,x_min_tabl , x_max_tabl, y_min_tabl ,y_max_tabl,_= find_new_features_of_contours(contours_tab)
 
