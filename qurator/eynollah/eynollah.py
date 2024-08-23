@@ -109,6 +109,7 @@ class Eynollah():
     ):
         self.dirs = dirs
         self.logger = logger
+        self.batch_processing_mode = bool(dirs.dir_in)
         if not dirs.dir_in:
             if image_pil:
                 self._imgs = self._cache_images(image_pil=image_pil)
@@ -160,7 +161,7 @@ class Eynollah():
         
         self.models : dict[str, tf.keras.Model] = {}
         
-        if self.dirs.dir_in and light_version:
+        if self.batch_processing_mode and light_version:
             config = tf.compat.v1.ConfigProto()
             config.gpu_options.allow_growth = True
             session = tf.compat.v1.Session(config=config)
@@ -176,7 +177,7 @@ class Eynollah():
             
             self.ls_imgs  = listdir(self.dirs.dir_in)
             
-        if self.dirs.dir_in and not light_version:
+        if self.batch_processing_mode and not light_version:
             config = tf.compat.v1.ConfigProto()
             config.gpu_options.allow_growth = True
             session = tf.compat.v1.Session(config=config)
@@ -392,7 +393,7 @@ class Eynollah():
             img = self.imread()
 
         _, page_coord = self.early_page_for_num_of_column_classification(img)
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_num_classifier = self.load_model(self.model_dir_of_col_classifier)
         if self.input_binary:
             img_in = np.copy(img)
@@ -416,7 +417,7 @@ class Eynollah():
             img_in[0, :, :, 1] = img_1ch[:, :]
             img_in[0, :, :, 2] = img_1ch[:, :]
 
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             label_p_pred = model_num_classifier.predict(img_in, verbose=0)
         else:
             label_p_pred = self.model_classifier.predict(img_in, verbose=0)
@@ -439,7 +440,7 @@ class Eynollah():
         self.logger.info("Detected %s DPI", dpi)
         if self.input_binary:
             img = self.imread()
-            if self.dirs.dir_in:
+            if self.batch_processing_mode:
                 prediction_bin = self.do_prediction(True, img, self.model_bin)
             else:
                 
@@ -461,7 +462,7 @@ class Eynollah():
 
         t1 = time.time()
         _, page_coord = self.early_page_for_num_of_column_classification(img_bin)
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_num_classifier = self.load_model(self.model_dir_of_col_classifier)
         
         if self.input_binary:
@@ -483,7 +484,7 @@ class Eynollah():
             img_in[0, :, :, 2] = img_1ch[:, :]
 
 
-        if self.dirs.dir_in:
+        if self.batch_processing_mode:
             label_p_pred = self.model_classifier.predict(img_in, verbose=0)
         else:
             label_p_pred = model_num_classifier.predict(img_in, verbose=0)
@@ -873,10 +874,10 @@ class Eynollah():
         if not self.ignore_page_extraction:
             img = cv2.GaussianBlur(self.image, (5, 5), 0)
             
-            if not self.dirs.dir_in:
+            if not self.batch_processing_mode:
                 model_page = self.load_model(self.model_page_dir)
                 
-            if not self.dirs.dir_in:
+            if not self.batch_processing_mode:
                 img_page_prediction = self.do_prediction(False, img, model_page)
             else:
                 img_page_prediction = self.do_prediction(False, img, self.model_page)
@@ -921,11 +922,11 @@ class Eynollah():
                 img = img.astype(np.uint8)
             else:
                 img = self.imread()
-            if not self.dirs.dir_in:
+            if not self.batch_processing_mode:
                 model_page = self.load_model(self.model_page_dir)
             img = cv2.GaussianBlur(img, (5, 5), 0)
             
-            if self.dirs.dir_in:
+            if self.batch_processing_mode:
                 img_page_prediction = self.do_prediction(False, img, self.model_page)
             else:
                 img_page_prediction = self.do_prediction(False, img, model_page)
@@ -954,7 +955,7 @@ class Eynollah():
         self.logger.debug("enter extract_text_regions")
         img_height_h = img.shape[0]
         img_width_h = img.shape[1]
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_region = self.load_model(self.model_region_dir_fully if patches else self.model_region_dir_fully_np)
         else:
             model_region = self.model_region_fl if patches else self.model_region_fl_np
@@ -1421,19 +1422,19 @@ class Eynollah():
 
     def textline_contours(self, img, patches, scaler_h, scaler_w):
         self.logger.debug('enter textline_contours')
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_textline = self.load_model(self.model_textline_dir if patches else self.model_textline_dir_np)
         img = img.astype(np.uint8)
         img_org = np.copy(img)
         img_h = img_org.shape[0]
         img_w = img_org.shape[1]
         img = resize_image(img_org, int(img_org.shape[0] * scaler_h), int(img_org.shape[1] * scaler_w))
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             prediction_textline = self.do_prediction(patches, img, model_textline)
         else:
             prediction_textline = self.do_prediction(patches, img, self.model_textline)
         prediction_textline = resize_image(prediction_textline, img_h, img_w)
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             prediction_textline_longshot = self.do_prediction(False, img, model_textline)
         else:
             prediction_textline_longshot = self.do_prediction(False, img, self.model_textline)
@@ -1514,7 +1515,7 @@ class Eynollah():
             img_h_new = int(img_org.shape[0] / float(img_org.shape[1]) * img_w_new)
         img_resized = resize_image(img,img_h_new, img_w_new )
         
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_bin = self.load_model(self.model_dir_of_binarization)
             prediction_bin = self.do_prediction(True, img_resized, model_bin)
         else:
@@ -1533,7 +1534,7 @@ class Eynollah():
         
         textline_mask_tot_ea = self.run_textline(img_bin)
 
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_region = self.load_model(self.model_region_dir_p_ens_light)
             prediction_regions_org = self.do_prediction_new_concept(True, img_bin, model_region)
         else:
@@ -1578,14 +1579,14 @@ class Eynollah():
         img_height_h = img_org.shape[0]
         img_width_h = img_org.shape[1]
         
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             model_region = self.load_model(self.model_region_dir_p_ens)
 
         ratio_y=1.3
         ratio_x=1
 
         img = resize_image(img_org, int(img_org.shape[0]*ratio_y), int(img_org.shape[1]*ratio_x))
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             prediction_regions_org_y = self.do_prediction(True, img, model_region)
         else:
             prediction_regions_org_y = self.do_prediction(True, img, self.model_region)
@@ -1607,7 +1608,7 @@ class Eynollah():
             
             img = resize_image(img_org, int(img_org.shape[0]), int(img_org.shape[1]*(1.2 if is_image_enhanced else 1)))
             
-            if self.dirs.dir_in:
+            if self.batch_processing_mode:
                 prediction_regions_org = self.do_prediction(True, img, self.model_region)
             else:
                 prediction_regions_org = self.do_prediction(True, img, model_region)
@@ -1617,12 +1618,12 @@ class Eynollah():
             prediction_regions_org[(prediction_regions_org[:,:]==1) & (mask_zeros_y[:,:]==1)]=0
             
             
-            if not self.dirs.dir_in:
+            if not self.batch_processing_mode:
                 model_region = self.load_model(self.model_region_dir_p2)
 
             img = resize_image(img_org, int(img_org.shape[0]), int(img_org.shape[1]))
             
-            if self.dirs.dir_in:
+            if self.batch_processing_mode:
                 prediction_regions_org2 = self.do_prediction(True, img, self.model_region_p2, 0.2)
             else:
                 prediction_regions_org2 = self.do_prediction(True, img, model_region, 0.2)
@@ -1656,7 +1657,7 @@ class Eynollah():
                 if self.input_binary:
                     prediction_bin = np.copy(img_org)
                 else:
-                    if not self.dirs.dir_in:
+                    if not self.batch_processing_mode:
                         model_bin = self.load_model(self.model_dir_of_binarization)
                         prediction_bin = self.do_prediction(True, img_org, model_bin)
                     else:
@@ -1669,7 +1670,7 @@ class Eynollah():
                     
                     prediction_bin =np.repeat(prediction_bin[:, :, np.newaxis], 3, axis=2)
                 
-                if not self.dirs.dir_in:
+                if not self.batch_processing_mode:
                     model_region = self.load_model(self.model_region_dir_p_ens)
                 ratio_y=1
                 ratio_x=1
@@ -1677,7 +1678,7 @@ class Eynollah():
 
                 img = resize_image(prediction_bin, int(img_org.shape[0]*ratio_y), int(img_org.shape[1]*ratio_x))
                 
-                if not self.dirs.dir_in:
+                if not self.batch_processing_mode:
                     prediction_regions_org = self.do_prediction(True, img, model_region)
                 else:
                     prediction_regions_org = self.do_prediction(True, img, self.model_region)
@@ -1709,7 +1710,7 @@ class Eynollah():
             if self.input_binary:
                 prediction_bin = np.copy(img_org)
                 
-                if not self.dirs.dir_in:
+                if not self.batch_processing_mode:
                     model_bin = self.load_model(self.model_dir_of_binarization)
                     prediction_bin = self.do_prediction(True, img_org, model_bin)
                 else:
@@ -1724,7 +1725,7 @@ class Eynollah():
                 prediction_bin =np.repeat(prediction_bin[:, :, np.newaxis], 3, axis=2)
             
             
-                if not self.dirs.dir_in:
+                if not self.batch_processing_mode:
                     model_region = self.load_model(self.model_region_dir_p_ens)
                     
             else:
@@ -1734,7 +1735,7 @@ class Eynollah():
 
 
             img = resize_image(prediction_bin, int(img_org.shape[0]*ratio_y), int(img_org.shape[1]*ratio_x))
-            if not self.dirs.dir_in:
+            if not self.batch_processing_mode:
                 prediction_regions_org = self.do_prediction(True, img, model_region)
             else:
                 prediction_regions_org = self.do_prediction(True, img, self.model_region)
@@ -2733,12 +2734,12 @@ class Eynollah():
 
         t0_tot = time.time()
 
-        if not self.dirs.dir_in:
+        if not self.batch_processing_mode:
             self.ls_imgs = [1]
         
         for img_name in self.ls_imgs:
             t0 = time.time()
-            if self.dirs.dir_in:
+            if self.batch_processing_mode:
                 self.reset_file_name_dir(join(self.dirs.dir_in,img_name))
             
             img_res, is_image_enhanced, num_col_classifier, num_column_is_classified = self.run_enhancement(self.light_version)
@@ -2767,7 +2768,7 @@ class Eynollah():
                 self.logger.info("No columns detected, outputting an empty PAGE-XML")
                 pcgts = self.writer.build_pagexml_no_full_layout([], page_coord, [], [], [], [], [], [], [], [], [], [], cont_page, [], [])
                 self.logger.info("Job done in %.1fs", time.time() - t1)
-                if self.dirs.dir_in:
+                if self.batch_processing_mode:
                     self.writer.write_pagexml(pcgts)
                     continue
                 else:
@@ -2995,7 +2996,7 @@ class Eynollah():
 
                 pcgts = self.writer.build_pagexml_full_layout(contours_only_text_parent, contours_only_text_parent_h, page_coord, order_text_new, id_of_texts_tot, all_found_textline_polygons, all_found_textline_polygons_h, all_box_coord, all_box_coord_h, polygons_of_images, contours_tables, polygons_of_drop_capitals, polygons_of_marginals, all_found_textline_polygons_marginals, all_box_coord_marginals, slopes, slopes_h, slopes_marginals, cont_page, polygons_lines_xml)
                 self.logger.info("Job done in %.1fs", time.time() - t0)
-                if not self.dirs.dir_in:
+                if not self.batch_processing_mode:
                     return pcgts
             else:
                 contours_only_text_parent_h = None
@@ -3006,11 +3007,11 @@ class Eynollah():
                     order_text_new, id_of_texts_tot = self.do_order_of_regions(contours_only_text_parent_d_ordered, contours_only_text_parent_h, boxes_d, textline_mask_tot_d)
                 pcgts = self.writer.build_pagexml_no_full_layout(txt_con_org, page_coord, order_text_new, id_of_texts_tot, all_found_textline_polygons, all_box_coord, polygons_of_images, polygons_of_marginals, all_found_textline_polygons_marginals, all_box_coord_marginals, slopes, slopes_marginals, cont_page, polygons_lines_xml, contours_tables)
                 self.logger.info("Job done in %.1fs", time.time() - t0)
-                if not self.dirs.dir_in:
+                if not self.batch_processing_mode:
                     return pcgts
             
-            if self.dirs.dir_in:
+            if self.batch_processing_mode:
                 self.writer.write_pagexml(pcgts)
                 #self.logger.info("Job done in %.1fs", time.time() - t0)
-        if self.dirs.dir_in:
+        if self.batch_processing_mode:
             self.logger.info("All jobs done in %.1fs", time.time() - t0_tot)
