@@ -6,7 +6,8 @@ from qurator.eynollah.cli import main as eynollah_cli
 
 testdir = Path(__file__).parent.resolve()
 
-EYNOLLAH_MODELS = environ.get('EYNOLLAH_MODELS', str(testdir.joinpath('..', 'models_eynollah').resolve()))
+# EYNOLLAH_MODELS = environ.get('EYNOLLAH_MODELS', str(testdir.joinpath('..', 'models_eynollah').resolve()))
+EYNOLLAH_MODELS = environ['EYNOLLAH_MODELS']
 
 class TestEynollahRun(TestCase):
 
