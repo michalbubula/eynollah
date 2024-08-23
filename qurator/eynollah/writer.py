@@ -2,6 +2,9 @@
 # pylint: disable=import-error
 from pathlib import Path
 import os.path
+from typing import Optional
+
+from ocrd_models import OcrdPage
 
 from .utils.xml import create_page_xml, xml_reading_order
 from .utils.counter import EynollahIdCounter
@@ -22,7 +25,15 @@ import numpy as np
 
 class EynollahXmlWriter():
 
-    def __init__(self, *, dir_out, image_filename, curved_line,textline_light, pcgts=None):
+    def __init__(
+        self,
+        *,
+        image_filename : str,
+        dir_out : Optional[str],
+        curved_line : bool,
+        textline_light : bool,
+        pcgts : Optional[OcrdPage] = None
+    ):
         self.logger = getLogger('eynollah.writer')
         self.counter = EynollahIdCounter()
         self.dir_out = dir_out

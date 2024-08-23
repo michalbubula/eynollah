@@ -3,6 +3,8 @@ from ocrd.processor.ocrd_page_result import OcrdPageResult
 from ocrd_models import OcrdPage
 from ocrd import Processor
 
+from qurator.eynollah.utils.dirs import EynollahDirs
+
 from .eynollah import Eynollah
 
 class EynollahProcessor(Processor):
@@ -20,7 +22,9 @@ class EynollahProcessor(Processor):
         # page_image, _, _ = self.workspace.image_from_page(page, page_id, feature_filter='binarized')
         image_filename = self.workspace.download_file(next(self.workspace.mets.find_files(local_filename=page.imageFilename))).local_filename
         Eynollah(
-            self.resolve_resource(self.parameter['models']),
+            EynollahDirs(
+                dir_models=self.resolve_resource(self.parameter['models']),
+            ),
             self.logger,
             allow_enhancement=self.parameter['allow_enhancement'],
             curved_line=self.parameter['curved_line'],
