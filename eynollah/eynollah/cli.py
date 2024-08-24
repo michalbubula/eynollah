@@ -1,8 +1,8 @@
 import sys
 import click
 from ocrd_utils import getLogger, initLogging, setOverrideLogLevel
-from qurator.eynollah.eynollah import Eynollah
-from qurator.eynollah.utils.dirs import EynollahDirs
+from eynollah.eynollah.eynollah import Eynollah
+from eynollah.eynollah.utils.dirs import EynollahDirs
 
 
 @click.command()
@@ -11,6 +11,7 @@ from qurator.eynollah.utils.dirs import EynollahDirs
     "-i",
     help="image filename",
     type=click.Path(exists=True, dir_okay=False),
+    # required=True,
 )
 @click.option(
     "--out",

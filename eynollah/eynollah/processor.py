@@ -7,6 +7,7 @@ from qurator.eynollah.utils.dirs import EynollahDirs
 
 from .eynollah import Eynollah
 
+
 class EynollahProcessor(Processor):
 
     @property

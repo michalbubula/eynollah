@@ -1,4 +1,4 @@
-from setuptools import setup, find_namespace_packages
+from setuptools import find_packages, setup
 from json import load
 
 install_requires = open('requirements.txt').read().split('\n')
@@ -13,15 +13,16 @@ setup(
     author='Vahid Rezanezhad',
     url='https://github.com/qurator-spk/eynollah',
     license='Apache License 2.0',
-    packages=find_namespace_packages(include=['qurator']),
+    namespace_packages=['eynollah'],
+    packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
     package_data={
         '': ['*.json']
     },
     entry_points={
         'console_scripts': [
-            'eynollah=qurator.eynollah.cli:main',
-            'ocrd-eynollah-segment=qurator.eynollah.ocrd_cli:main',
+            'eynollah=eynollah.eynollah.cli:main',
+            'ocrd-eynollah-segment=eynollah.eynollah.ocrd_cli:main',
         ]
     },
 )

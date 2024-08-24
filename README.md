@@ -17,11 +17,12 @@
 * Detection of reading order (left-to-right or right-to-left)
 * Output in [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML)
 * [OCR-D](https://github.com/qurator-spk/eynollah#use-as-ocr-d-processor) interface
+* [Examples](https://github.com/qurator-spk/eynollah/wiki#examples)
 
 :warning: Development is currently focused on achieving the best possible quality of results for a wide variety of historical documents and therefore processing can be very slow. We aim to improve this, but contributions are welcome.
 
 ## Installation
-Python `3.8-3.11` with Tensorflow `2.12-2.15` on Linux are currently supported.
+Python versions `3.8-3.11` with Tensorflow versions `<2.16` on Linux are currently supported.
 
 For (limited) GPU support the CUDA toolkit needs to be installed.
 
@@ -38,7 +39,7 @@ git clone git@github.com:qurator-spk/eynollah.git
 cd eynollah; pip install -e .
 ```
 
-Alternatively, you can run `make install` or `make install-dev` for editable installation.
+Alternatively, run `make install` or `make install-dev` for editable installation.
 
 ## Models
 Pre-trained models can be downloaded from [qurator-data.de](https://qurator-data.de/eynollah/) or [huggingface](https://huggingface.co/SBB?search_models=eynollah). 
@@ -46,9 +47,9 @@ Pre-trained models can be downloaded from [qurator-data.de](https://qurator-data
 ## Train
 🚧 **Work in progress**  
   
-In case you want to train your own model, have a look at [`sbb_pixelwise_segmentation`](https://github.com/qurator-spk/sbb_pixelwise_segmentation). 
+In case you want to train your own model, have a look at [`train`](https://github.com/qurator-spk/eynollah/tree/main/eynollah/eynollah/train). 
 
-## Usage
+## Use
 The command-line interface can be called like this:
 
 ```sh
@@ -82,7 +83,6 @@ If no option is set, the tool performs layout detection of main regions (backgro
 The best output quality is produced when RGB images are used as input rather than greyscale or binarized images.
 
 #### Use as OCR-D processor
-🚧 **Work in progress** 
 
 Eynollah ships with a CLI interface to be used as [OCR-D](https://ocr-d.de) processor. 
 
@@ -104,7 +104,7 @@ uses the original (RGB) image despite any binarization that may have occured in 
 Please check the [wiki](https://github.com/qurator-spk/eynollah/wiki).
 
 ## How to cite
-If you find this tool useful in your work, please consider citing our paper:
+If you find this useful in your work, please consider citing our paper:
 
 ```bibtex
 @inproceedings{hip23rezanezhad,
